@@ -3,9 +3,11 @@ from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.getOrCreate()
 
+# Both on the HDFS
 datasets_path = "/user/s1710699/websdr-referers"
 outfiles_path = 'websdr-countries'
 
+# Since the data is already sorted by month we can save some grouping
 for year in range(2014, 2023):
     for month in range(1, 13):
 
