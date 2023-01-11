@@ -18,6 +18,13 @@ def post_process(df):
     amp_df = amp_df.str.replace('/', '-')
     df.loc[amp_selector, 'host'] = amp_df
 
+    # Make all lowercase
+    host = host.str.lower()
+    # Remove '.' from the end if present
+    host = host.str.removesuffix('.')
+    # Remove 'www.' from start if present
+    host = host.str.removeprefix('www.')
+
     # google search
     google_selector = host.str.startswith('google.', na=False) | host.isin(['com.google.android.googlequicksearchbox', 'startgoogle.startpagina.nl'])
     df.loc[google_selector, 'host'] = 'google.com'

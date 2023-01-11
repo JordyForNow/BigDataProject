@@ -17,13 +17,6 @@ for year in range(2014, 2023):
         if path.exists(in_path):
             df = pd.read_csv(in_path, header=None, names=['count', 'host'])
 
-            # lowercase
-            df['host'] = df['host'].str.lower()
-            # squash urls ending in dots
-            df['host'] = df['host'].str.removesuffix('.')
-            # squash www. duplicates
-            df['host'] = df['host'].str.removeprefix('www.')
-
             df = post_process(df)
 
             df = df.groupby('host').sum().reset_index()

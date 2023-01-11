@@ -25,14 +25,6 @@ for year in years:
 #%%
 df_concat = pd.concat(dataframes)
 
-#%% preprocessing
-df_concat['host'] = df_concat['host'].str.lower()
-#%% squash urls ending in dots
-df_concat['host'] = df_concat['host'].str.removesuffix('.')
-
-#%% squash www. duplicates
-df_concat['host'] = df_concat['host'].str.removeprefix('www.')
-
 #%%
 all_hosts = df_concat.groupby('host').sum().reset_index()
 
