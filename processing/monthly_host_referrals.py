@@ -1,13 +1,13 @@
-from pyspark.sql.functions import col, expr, date_trunc, split
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, expr, split
 
 spark = SparkSession.builder.getOrCreate()
 
-# TODO fix IPV6 [2001:67c:2564:532:250:daff:fe6e:c945] parsing to [2001
-
+# Both on the HDFS
 datasets_path = "/user/s1710699/websdr-referers"
 outfiles_path = 'websdr-referers'
 
+# Since the data is already sorted by month we can save some grouping
 for year in range(2014, 2023):
     for month in range(1, 13):
 
@@ -25,11 +25,14 @@ for year in range(2014, 2023):
 
         df = spark.read.parquet(dataset_path)
 
-        # Parse just the hostname from the referrer field
+        # NOTE: this parsing breaks ipv6 addresses, but since there are only a few those can be fixed later
+        # Parse just the hostname from the referrer field, remove protocols, paths and ports
         hosts_df = df.select(split(split(expr("substring(request, 10)"), '/')[2], ':')[0].alias('host'))
 
         host_referrals_df = hosts_df.groupBy(col('host')).count()
 
         outfile_path = outfiles_path + year_folder + month_folder
 
+        # We have a relatively small amount of hosts, so we can coalesce into a single partition
+        # to avoid creating many small files on the HDFS
         host_referrals_df.coalesce(1).write.csv(outfile_path)

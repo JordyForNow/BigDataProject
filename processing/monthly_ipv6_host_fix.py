@@ -1,11 +1,13 @@
-from pyspark.sql.functions import col, expr, date_trunc, split, concat, slice
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, expr, split
 
 spark = SparkSession.builder.getOrCreate()
 
+# Both on the HDFS
 datasets_path = "/user/s1710699/websdr-referers"
 outfiles_path = 'ipv6-websdr-referers'
 
+# Since the data is already sorted by month we can save some grouping
 for year in range(2014, 2023):
     for month in range(1, 13):
 
@@ -24,24 +26,24 @@ for year in range(2014, 2023):
         df = spark.read.parquet(dataset_path)
 
         # Parse just the hostname from the referrer field
-        # remove referer prefix
+        # Remove 'Referer: ' prefix
+        # NOTE: we use an expression since the function only works with a fixed length
         step1 = expr("substring(request, 10)")
-        # keep online website
+        # Remove protocols and paths
         step2 = split(step1, '/')[2]
 
-        # test6 = '[2001:67c:2564:532:250:daff:fe6e:c945]:5001'.split(']')[0].split('[')
-        # test4 = 'google.com:1234'.split(']')[0].split('[')
-        # (test6[0].split(':')[:1] + test6[1:])[-1]
-        # (test4[0].split(':')[:1] + test4[1:])[-1]
+        # Only ipv6 addresses start with a [ in this dataset
+        ipv6_hosts_df = df.select(step2.alias('host')).where(step2.startswith('['))
 
-        ipv6_hosts_df = df.select(step2.alias('host')).where(col('host').startswith('['))
-        # remove ports
-        step3 = split(split(step2, ']')[0], '\[')[1]
+        # Remove ports and square brackets
+        step3 = split(split(col('host'), ']')[0], '\[')[1]
 
-        hosts_df = df.select(step3.alias('host')).where(col('host') != '')
+        hosts_df = ipv6_hosts_df.select(step3.alias('host'))
 
         host_referrals_df = hosts_df.groupBy(col('host')).count()
 
         outfile_path = outfiles_path + year_folder + month_folder
 
+        # We have a relatively small amount of hosts, so we can coalesce into a single partition
+        # to avoid creating many small files on the HDFS
         host_referrals_df.coalesce(1).write.csv(outfile_path)
