@@ -5,8 +5,8 @@ import pandas as pd
 from os import path
 from post_processing import post_process
 
-in_folder = '../referrer-monthly-hosts'
-out_folder = '../referrer-monthly-hosts_processed'
+in_folder = '../../Data/referrer-monthly-hosts'
+out_folder = '../../Data/referrer-monthly-hosts_processed'
 
 for year in range(2014, 2023):
     for month in range(1, 13):

@@ -3,7 +3,8 @@ from os import path
 
 #%%
 
-folder = '../referrer-monthly-hosts'
+# Use the unprocessed hosts here to debug the post-processing
+folder = '../../Data/referrer-monthly-hosts'
 
 years = range(2014, 2023)
 

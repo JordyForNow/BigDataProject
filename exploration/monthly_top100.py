@@ -4,8 +4,8 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
 from os import path
 
-in_folder = '../referrer-monthly-hosts_processed'
-out_file = 'referrer-monthly-top100.csv'
+in_folder = '../Data/referrer-monthly-hosts_processed'
+out_file = '../Data/referrer-monthly-top100.csv'
 
 top100_index = pd.Index(range(1, 101))
 
