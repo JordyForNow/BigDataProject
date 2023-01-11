@@ -25,9 +25,18 @@ for year in range(2014, 2023):
 
         df = spark.read.parquet(dataset_path)
 
-        # NOTE: this parsing breaks ipv6 addresses, but since there are only a few those can be fixed later
-        # Parse just the hostname from the referrer field, remove protocols, paths and ports
-        hosts_df = df.select(split(split(expr("substring(request, 10)"), '/')[2], ':')[0].alias('host'))
+        # Parse just the hostname from the referrer field
+        # Remove 'Referer: ' prefix
+        # NOTE: we use an expression since the function only works with a fixed length
+        step1 = expr("substring(request, 10)")
+        # Remove protocols and paths
+        step2 = split(step1, '/')[2]
+        # Remove ports
+        # NOTE: this step breaks ipv6 addresses, but since there are only a few those can be fixed later
+        #       logic that could parse both would be far more complex to run
+        step3 = split(step2, ':')[0]
+
+        hosts_df = df.select(step3.alias('host'))
 
         host_referrals_df = hosts_df.groupBy(col('host')).count()
 
