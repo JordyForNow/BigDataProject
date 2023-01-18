@@ -5,6 +5,7 @@ from os import path
 
 # Use the unprocessed hosts here to debug the post-processing
 folder = '../../Data/referrer-monthly-hosts'
+out_file = '../../Data/all_hosts.csv'
 
 years = range(2014, 2023)
 
@@ -30,4 +31,4 @@ df_concat = pd.concat(dataframes)
 all_hosts = df_concat.groupby('host').sum().reset_index()
 
 #%%
-all_hosts.to_csv('all_hosts.csv', index=False)
+all_hosts.to_csv(out_file, index=False)
