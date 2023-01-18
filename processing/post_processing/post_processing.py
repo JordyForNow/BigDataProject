@@ -1,6 +1,12 @@
 import pandas as pd
 
 
+def post_process(df: pd.DataFrame) -> pd.DataFrame:
+    df = simple_process(df)
+    df = host_process(df)
+    return df.groupby('host').sum().reset_index()
+
+
 def simple_process(df: pd.DataFrame) -> pd.DataFrame:
     host = df['host']
 
@@ -24,15 +30,17 @@ def simple_process(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def post_process(df: pd.DataFrame) -> pd.DataFrame:
-    df = simple_process(df)
+def host_process(df: pd.DataFrame) -> pd.DataFrame:
     host = df['host']
 
     def domain_selector(domain: str):
         return host.str.endswith(f'.{domain}', na=False) | (host == domain)
 
     # google search
-    google_selector = host.str.startswith('google.', na=False) | host.isin(['com.google.android.googlequicksearchbox', 'startgoogle.startpagina.nl'])
+    google_selector = host.str.startswith('google.', na=False) | host.isin([
+        'com.google.android.googlequicksearchbox',
+        'startgoogle.startpagina.nl'
+    ])
     df.loc[google_selector, 'host'] = 'google.com'
 
     # google plus
@@ -51,7 +59,17 @@ def post_process(df: pd.DataFrame) -> pd.DataFrame:
     #     '2001:67c:2564:532:250:daff:fe6e:c945': 'websdr.ewi.utwente.nl',
     # }
 
-    websdr_selector = host.isin(['192.87.173.88', '130.89.192.8', '2001:67c:2564:532:250:daff:fe6e:c945', '2001:67c:2564:ac33:da5d:4cff:fe80:9a66', 'etgd1.ewi.utwente.nl', 'websdr.ewi.utwente.nl', 'websdr.org', 'websdr6', 'etgd-websdr.ewi.utwente.nl'])
+    websdr_selector = host.isin([
+        '192.87.173.88',
+        '130.89.192.8',
+        '2001:67c:2564:532:250:daff:fe6e:c945',
+        '2001:67c:2564:ac33:da5d:4cff:fe80:9a66',
+        'etgd1.ewi.utwente.nl',
+        'websdr.ewi.utwente.nl',
+        'websdr.org',
+        'websdr6',
+        'etgd-websdr.ewi.utwente.nl'
+    ])
     df.loc[websdr_selector, 'host'] = 'websdr.ewi.utwente.nl'
 
     # yahoo search
@@ -98,7 +116,6 @@ def post_process(df: pd.DataFrame) -> pd.DataFrame:
     ref_selector = host.str.contains('ref-union', na=False) | host.str.contains('r-e-f', na=False)
     df.loc[ref_selector, 'host'] = 'ref-union.org'
 
-
     # TODO add gmail/gmail app and other mail clients?
 
     # simple domains
@@ -136,4 +153,4 @@ def post_process(df: pd.DataFrame) -> pd.DataFrame:
     for simple_domain in simple_domains:
         df.loc[domain_selector(simple_domain), 'host'] = simple_domain
 
-    return df.groupby('host').sum().reset_index()
+    return df
