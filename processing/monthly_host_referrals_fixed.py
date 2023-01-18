@@ -35,8 +35,7 @@ for year in range(2014, 2023):
         is_ipv6 = step2.startswith('[')
 
         # Remove ports
-        # NOTE: this step breaks ipv6 addresses, but since there are only a few those can be fixed later
-        #       logic that could parse both would be far more complex to run
+        # NOTE: this step breaks ipv6 addresses, so those are processed differently
         step3 = split(step2, ':')[0]
 
         step3_ipv6 = split(split(step2, ']')[0], '\[')[1]
