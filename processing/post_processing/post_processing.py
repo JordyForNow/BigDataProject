@@ -1,11 +1,8 @@
 import pandas as pd
 
 
-def post_process(df):
+def simple_process(df: pd.DataFrame) -> pd.DataFrame:
     host = df['host']
-
-    def domain_selector(domain: str):
-        return host.str.endswith(f'.{domain}', na=False) | (host == domain)
 
     # de-amp
     amp_selector = host.str.endswith('cdn.ampproject.org', na=False)
@@ -17,13 +14,22 @@ def post_process(df):
     amp_df = amp_df.str.replace('-', '.')
     amp_df = amp_df.str.replace('/', '-')
     df.loc[amp_selector, 'host'] = amp_df
-
     # Make all lowercase
     host = host.str.lower()
     # Remove '.' from the end if present
     host = host.str.removesuffix('.')
     # Remove 'www.' from start if present
     host = host.str.removeprefix('www.')
+
+    return df
+
+
+def post_process(df: pd.DataFrame) -> pd.DataFrame:
+    df = simple_process(df)
+    host = df['host']
+
+    def domain_selector(domain: str):
+        return host.str.endswith(f'.{domain}', na=False) | (host == domain)
 
     # google search
     google_selector = host.str.startswith('google.', na=False) | host.isin(['com.google.android.googlequicksearchbox', 'startgoogle.startpagina.nl'])
