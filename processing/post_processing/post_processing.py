@@ -27,6 +27,8 @@ def simple_process(df: pd.DataFrame) -> pd.DataFrame:
     # Remove 'www.' from start if present
     host = host.str.removeprefix('www.')
 
+    df['host'] = host
+
     return df
 
 
