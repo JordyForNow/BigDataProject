@@ -28,7 +28,7 @@ for year in years:
 df_concat = pd.concat(dataframes)
 
 #%%
-all_hosts = df_concat.groupby('host').sum().reset_index()
+all_hosts = df_concat.groupby('host', dropna=False).sum().reset_index()
 
 #%%
 all_hosts.to_csv(out_file, index=False)

@@ -4,7 +4,7 @@ import pandas as pd
 def post_process(df: pd.DataFrame) -> pd.DataFrame:
     df = simple_process(df)
     df = host_process(df)
-    return df.groupby('host').sum().reset_index()
+    return df.groupby('host', dropna=False).sum().reset_index()
 
 
 def simple_process(df: pd.DataFrame) -> pd.DataFrame:
