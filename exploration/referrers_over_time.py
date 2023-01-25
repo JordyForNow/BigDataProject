@@ -114,7 +114,7 @@ plt.show()
 amount_of_hosts_spike = result.loc[(2019, 7)]
 amount_of_hosts_spike = amount_of_hosts_spike[~amount_of_hosts_spike.isna()]
 
-host_distribution_start = result_no_websdr.loc[(2014, 1)]
+host_distribution_start = result_no_websdr.loc[(2014, 4)]
 host_distribution_start = host_distribution_start[~host_distribution_start.isna()]
 
 host_distribution_end = result_no_websdr.loc[(2022, 1)]
@@ -124,11 +124,11 @@ max_referrals = int(max(host_distribution_start.max(), host_distribution_end.max
 
 exponential_buckets = np.logspace(0, np.log10(max_referrals + 1000))
 
-start_hist = host_distribution_start.plot.hist(bins=exponential_buckets, density=True)
-end_hist = host_distribution_end.plot.hist(bins=exponential_buckets, density=True, alpha=0.7)
+start_hist = host_distribution_start.plot.hist(bins=exponential_buckets)
+end_hist = host_distribution_end.plot.hist(bins=exponential_buckets, alpha=0.7)
 # plt.plot([0, max_referrals], [])
 plt.xscale('log')
 plt.yscale('log')
-plt.ylabel('density')
-plt.legend(['januari 2014', 'januari 2022'])
+# plt.ylabel('density')
+plt.legend(['April 2014', 'January 2022'])
 plt.show()
