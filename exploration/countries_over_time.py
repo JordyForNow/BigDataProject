@@ -127,13 +127,21 @@ def label_filter(row):
 
 labels = years_index.where(years_index['month'] == 1).apply(label_filter, result_type='reduce', axis=1)
 
+fontsize = 17
 fig, ax = plt.subplots()
 fig.set_size_inches(40, 10)
 # im = ax.imshow(sorted_result_dist.values)
 im = ax.pcolormesh(sorted_result_dist.values, norm='log', cmap='plasma')
 ax.set_xticks(np.arange(sorted_result_dist.columns.size), labels=sorted_result_dist.columns, rotation=90, ha="right",
          rotation_mode="anchor")
-ax.set_yticks(np.arange(labels.size), labels=labels)
+ax.set_yticks(np.arange(labels.size), labels=labels, fontsize=fontsize)
+
+# cbaxes = fig.add_axes([])
+
+cbar = plt.colorbar(im, ax=ax, pad=0.01)
+cbar.ax.tick_params(labelsize=fontsize)
+cbar.ax.set_ylabel('Percentage of traffic', fontsize=fontsize)
+plt.tight_layout()
 plt.show()
 
 # Plot sudden spike countries

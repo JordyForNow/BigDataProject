@@ -69,7 +69,6 @@ months_of_interest_indexes = [
     12 * (2017 - 2014) + 7 - 1,
     12 * (2017 - 2014) + 12 - 1,
     12 * (2019 - 2014) + 2 - 1,
-    12 * (2020 - 2014) + 6 - 1,
     12 * (2021 - 2014) + 2 - 1
 ]
 
@@ -101,14 +100,49 @@ lgnd.set_title('Year, Month')
 plt.tight_layout()
 plt.show()
 
-specific_country_res = result_no_websdr['GB']
+specific_country_res = result_no_websdr['FI']
 specific_country_alltime = specific_country_res.sum()
 specific_country_all_traffic = specific_country_alltime.sum()
 specific_country_alltime_distribution = specific_country_alltime / specific_country_all_traffic * 100
 
 
-moi_index = months_of_interest_indexes[2]
+moi_index = months_of_interest_indexes[5]
 specific_country_month = specific_country_res.iloc[moi_index]
 specific_country_month_all = specific_country_month.sum()
 specific_country_month_distribution = specific_country_month / specific_country_month_all * 100
 specific_country_month_distribution.name = specific_country_res.index[moi_index]
+
+
+##
+# Continuous dark band
+##
+
+months_of_interest_indexes = np.arange(12 * (2020 - 2014) + 6 - 1, 12 * (2020 - 2014) + 12 - 1)
+
+countries_all_time_percentage.name = 'All time'
+all_windows = []
+
+for month_index in months_of_interest_indexes:
+    month_of_interest = country_result.iloc[month_index:month_index+1][countries_sort_key]
+    window_traffic = month_of_interest.sum(axis=0)
+    all_window_traffic = window_traffic.sum()
+    window_traffic_percentage = window_traffic / all_window_traffic * 100
+    window_traffic_percentage.name = country_result.index[month_index]
+    all_windows.append(window_traffic_percentage)
+
+traffic_percentages = pd.concat(all_windows, axis=1)
+
+topn = 15
+bar_width = 0.8
+
+traffic_percentages[:topn].plot.bar(figsize=(8,4), width=bar_width)
+countries_all_time_percentage[:topn].plot.bar(alpha=0.5, color='gray', width=bar_width)
+# window_traffic_percentage[:25].plot.bar(alpha=0.7, color='C1')
+# plt.legend(['All time', 'July 2017'])
+plt.ylabel('Percentage of traffic')
+# plt.yscale('log')
+# plt.yticks([0, 10, 50], ['0', '10', '50'])
+lgnd = plt.legend()
+lgnd.set_title('Year, Month')
+plt.tight_layout()
+plt.show()

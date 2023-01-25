@@ -73,6 +73,10 @@ plt.show()
 emptiness = top_result_no_wbsdr_dist.count().sort_values(ascending=False)
 es_top_results = top_result_no_wbsdr_dist[emptiness.index]
 
+emptiness.name = 'emptiness'
+hosts_all_time.name = 'hat'
+sort_key = pd.concat([emptiness, hosts_all_time], axis=1).loc[top_result_no_wbsdr.columns].sort_values(['emptiness', 'hat'], ascending=False, na_position='first')
+
 fig, ax = plt.subplots()
 fig.set_size_inches(40, 15)
 im = ax.pcolormesh(es_top_results.values, norm='log', cmap='plasma')
@@ -83,14 +87,19 @@ cbar = ax.figure.colorbar(im, ax=ax)
 plt.tight_layout()
 plt.show()
 
+st_result_no_websdr = top_result_no_wbsdr[sort_key.index]
 
+fontsize = 17
 fig, ax = plt.subplots()
-fig.set_size_inches(40, 15)
-im = ax.pcolormesh(top_result_no_wbsdr.values, norm='log', cmap='plasma')
-ax.set_xticks(np.arange(top_result_no_wbsdr.columns.size), labels=top_result_no_wbsdr.columns, rotation=90, ha="right",
+fig.set_size_inches(40, 10)
+im = ax.pcolormesh(st_result_no_websdr.values, norm='log', cmap='plasma')
+ax.set_xticks(np.arange(st_result_no_websdr.columns.size), labels=st_result_no_websdr.columns, rotation=90, ha="right",
          rotation_mode="anchor")
-ax.set_yticks(np.arange(years_labels.size), labels=years_labels)
-cbar = ax.figure.colorbar(im, ax=ax)
+ax.set_yticks(np.arange(years_labels.size), labels=years_labels, fontsize=fontsize)
+
+cbar = plt.colorbar(im, ax=ax, pad=0.01)
+cbar.ax.tick_params(labelsize=fontsize)
+cbar.ax.set_ylabel('Percentage of traffic', fontsize=fontsize)
 plt.tight_layout()
 plt.show()
 
