@@ -118,6 +118,10 @@ def host_process(df: pd.DataFrame) -> pd.DataFrame:
     ref_selector = host.str.contains('ref-union', na=False) | host.str.contains('r-e-f', na=False)
     df.loc[ref_selector, 'host'] = 'ref-union.org'
 
+    # burp collaborator
+    burp_filter = host.str.contains('burpcollab', na=False)
+    df.loc[burp_filter, 'host'] = 'burpcollaborator.net'
+
     # TODO add gmail/gmail app and other mail clients?
 
     # simple domains
