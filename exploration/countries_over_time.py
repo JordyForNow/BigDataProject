@@ -73,12 +73,19 @@ plt.show()
 dif_moving_average = differencing.rolling(window=12).mean()
 dif_moving_std = differencing.rolling(window=12).std()
 
-differencing.plot(figsize=(20, 10), title='Traffic detrended', xticks=[12*i for i in range(0, 10)])
-dif_moving_average.plot()
+differencing.plot(figsize=(6, 4), title='Traffic detrended')
+
+# dif_moving_average.plot()
 # dif_moving_std.plot()
 plt.hlines([differencing.std(), -differencing.std()], 0, differencing.size - 1, colors='C1')
 # plt.hlines(0, 0, differencing.size - 1, colors='black')
 plt.grid(visible=True)
+
+plt.xticks([12*i-1 for i in range(0, 10)], rotation=90, labels=np.arange(2014,2024))
+plt.xlabel('Year')
+plt.ylabel('Traffic Delta')
+
+plt.tight_layout()
 
 plt.legend(['Traffic', 'Std'])
 plt.show()
@@ -88,12 +95,12 @@ plt.show()
 sorted_countries_key = countries_all_time.reset_index()['country']
 result_dist = result.div(all_visits_all_months, axis=0)
 sorted_result_dist = result_dist[sorted_countries_key]
-sorted_result_dist.plot.bar(stacked=True, legend=False, figsize=(20, 10), title='Country Traffic Distribution')
-
-# handles, labels = plt.axes().get_legend_handles_labels()
-plt.legend(sorted_countries_key[:30], bbox_to_anchor=(1.04, 1), loc='upper left')
-# plt.savefig('../Plots/country_distribution.png')
-plt.show()
+# sorted_result_dist.plot.bar(stacked=True, legend=False, figsize=(20, 10), title='Country Traffic Distribution')
+#
+# # handles, labels = plt.axes().get_legend_handles_labels()
+# plt.legend(sorted_countries_key[:30], bbox_to_anchor=(1.04, 1), loc='upper left')
+# # plt.savefig('../Plots/country_distribution.png')
+# plt.show()
 
 plt.axes().xaxis.set_minor_locator(mpl.ticker.AutoMinorLocator(1))
 plt.minorticks_on()
@@ -127,4 +134,18 @@ im = ax.pcolormesh(sorted_result_dist.values, norm='log', cmap='plasma')
 ax.set_xticks(np.arange(sorted_result_dist.columns.size), labels=sorted_result_dist.columns, rotation=90, ha="right",
          rotation_mode="anchor")
 ax.set_yticks(np.arange(labels.size), labels=labels)
+plt.show()
+
+# Plot sudden spike countries
+visual_lh_countries = ['RE', 'MZ', 'NC', 'CK', 'PF']
+visual_lh_result = result[visual_lh_countries]
+
+
+
+plot = visual_lh_result.plot(alpha=0.7)
+plot.hlines(visual_lh_result.median(), 0, visual_lh_result.index.size - 1, linestyles='dashed', colors=['C0', 'C1', 'C2', 'C3', 'C4'])
+# plt.hlines(1e4, 0, visual_lh_result.index.size - 1, linestyles='dashed', colors='black')
+plot.axes.set_xticks(np.arange(9)*12, labels=np.arange(2014,2023))
+plot.axes.set_xlabel('year')
+plt.yscale('log')
 plt.show()
