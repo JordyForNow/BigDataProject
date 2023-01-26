@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, expr, split, when
+from pyspark.sql.functions import *
 
 spark = SparkSession.builder.getOrCreate()
 
@@ -17,9 +17,7 @@ for year in range(2014, 2023):
 
         print('Processing: {} {}'.format(year, month))
 
-        year_folder = "/year=" + str(year)
-        month_folder = "/month=" + str(month)
-        dataset_path = datasets_path + year_folder + month_folder
+        dataset_path = datasets_path + "/year=" + str(year) + "/month=" + str(month)
 
         print(dataset_path)
 
@@ -44,7 +42,7 @@ for year in range(2014, 2023):
 
         host_referrals_df = hosts_df.groupBy(col('host')).count()
 
-        outfile_path = outfiles_path + year_folder + month_folder
+        outfile_path = outfiles_path + "/year=" + str(year) + "/month=" + str(month)
 
         # We have a relatively small amount of hosts, so we can coalesce into a single partition
         # to avoid creating many small files on the HDFS
