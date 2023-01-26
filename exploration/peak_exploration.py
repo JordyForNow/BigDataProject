@@ -9,6 +9,10 @@ import numpy as np
 
 in_folder = '../Data/referrer-monthly-host-countries_processed'
 
+###
+# Coalesce the data for all months into a single dataframe
+###
+
 monthly_dataframes = []
 
 for year in range(2014, 2023):
@@ -26,9 +30,14 @@ for year in range(2014, 2023):
 
 all_months = pd.concat(monthly_dataframes)
 
+# Shift the indexes so rows are months and columns are countries and referrers
 result = all_months.pivot(index=['year', 'month'], values='count', columns=['country', 'host'])
+# Remove the websdr itself, as it takes up the bulk of referrals and is not very interesting
 result_no_websdr = result.drop(columns='websdr.ewi.utwente.nl', level=1)
 
+##
+# Investigate referrer distribution for sudden spikes in country traffic (vertical bands)
+##
 visual_lh_countries = ['RE', 'MZ', 'NC', 'CK', 'PF']
 
 country = 'CA'
@@ -38,24 +47,18 @@ start_month = 12*(2017-2014)
 end_month = 12*(2018-2014)
 
 months_of_interest = country_res.iloc[start_month:end_month]
-hosts_of_interest = months_of_interest.loc[:,(~months_of_interest.isna()).any()]
+# Keep only referrers that occured in our window of interest
+hosts_of_interest = months_of_interest.loc[:, (~months_of_interest.isna()).any()]
 
+# Get traffic per referrer in our window
 host_totals = hosts_of_interest.sum().sort_values(ascending=False)
 all_visits = host_totals.sum()
-
+# Turn this into percentages using the total amount of visits in our window
 host_distribution = host_totals / all_visits * 100
 
-
-# fig, ax = plt.subplots()
-# fig.set_size_inches(40, 15)
-# im = ax.pcolormesh(top_result_no_wbsdr.values, norm='log', cmap='plasma')
-# ax.set_xticks(np.arange(top_result_no_wbsdr.columns.size), labels=top_result_no_wbsdr.columns, rotation=90, ha="right",
-#          rotation_mode="anchor")
-# ax.set_yticks(np.arange(years_labels.size), labels=years_labels)
-# cbar = ax.figure.colorbar(im, ax=ax)
-# plt.tight_layout()
-# plt.show()
-
+##
+# Investigate country distribution for sudden dips in country traffic (horizontal bands)
+##
 country_result = all_months.groupby(['country', 'year', 'month']).sum().reset_index().pivot(index=['year', 'month'], values='count', columns='country')
 
 countries_all_time = country_result.sum().sort_values(ascending=False)
@@ -85,6 +88,7 @@ for month_index in months_of_interest_indexes:
 
 traffic_percentages = pd.concat(all_windows, axis=1)
 
+# Plot only the countries that contributed significantly to total traffic
 topn = 15
 bar_width = 0.8
 
@@ -100,6 +104,9 @@ lgnd.set_title('Year, Month')
 plt.tight_layout()
 plt.show()
 
+##
+# Investigate referrer distribution for sudden spikes in country traffic
+##
 specific_country_res = result_no_websdr['FI']
 specific_country_alltime = specific_country_res.sum()
 specific_country_all_traffic = specific_country_alltime.sum()
